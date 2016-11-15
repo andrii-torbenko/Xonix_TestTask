@@ -27,10 +27,10 @@ public static class SwipeInput {
             }
         }
 #elif UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) Field.player.PlayerDirection = Enumerators.PlayerDirection.L;
-        else if (Input.GetKeyDown(KeyCode.RightArrow)) Field.player.PlayerDirection = Enumerators.PlayerDirection.R;
-        else if (Input.GetKeyDown(KeyCode.UpArrow)) Field.player.PlayerDirection = Enumerators.PlayerDirection.U;
-        else if (Input.GetKeyDown(KeyCode.DownArrow)) Field.player.PlayerDirection = Enumerators.PlayerDirection.D;
+        if (Input.GetKeyDown(KeyCode.LeftArrow)) FieldManager.player.PlayerDirection = Enumerators.PlayerDirection.L;
+        else if (Input.GetKeyDown(KeyCode.RightArrow)) FieldManager.player.PlayerDirection = Enumerators.PlayerDirection.R;
+        else if (Input.GetKeyDown(KeyCode.UpArrow)) FieldManager.player.PlayerDirection = Enumerators.PlayerDirection.U;
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) FieldManager.player.PlayerDirection = Enumerators.PlayerDirection.D;
 #endif
     }
 }

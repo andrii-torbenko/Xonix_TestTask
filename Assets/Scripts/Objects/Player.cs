@@ -24,7 +24,7 @@ public class Player : DynamicSquare {
     }
 
     public void ResetPlayer() {
-        position = new IntVector2(Field.cols / 2, 0);
+        position = new IntVector2(FieldManager.cols / 2, 0);
         _isLeavingTrack = false;
         _isMoving = false;
     }
@@ -41,29 +41,29 @@ public class Player : DynamicSquare {
             case Enumerators.PlayerDirection.D: nextPos += new IntVector2(0, 1); break;
         }
 
-        if (nextPos.x >= 0 && nextPos.y >= 0 && nextPos.x < Field.cols && nextPos.y < Field.rows) {
+        if (nextPos.x >= 0 && nextPos.y >= 0 && nextPos.x < FieldManager.cols && nextPos.y < FieldManager.rows) {
             IntVector2 temp = position;
             position = nextPos;
             
-            Enumerators.StaticSquareType nextSquareType = Field.GetSquareType(position);
+            Enumerators.StaticSquareType nextSquareType = FieldManager.GetSquareType(position);
 
             switch (nextSquareType) {
                 case Enumerators.StaticSquareType.WTR:
-                    Field.AddTrack(position);
+                    FieldManager.AddTrack(position);
                     _isLeavingTrack = true;
                     break;
                 case Enumerators.StaticSquareType.GRD:
                     if (_isLeavingTrack) {
                         _isMoving = false;
                         _isLeavingTrack = false;
-                        Field.SeizeFieldsWithNoEnemies();
+                        FieldManager.SeizeFieldsWithNoEnemies();
                         Debug.Log("Need to seize ground.");
                     }
                     break;
                 case Enumerators.StaticSquareType.TRK:
                     if (_isLeavingTrack) {
                         _isMoving = false;
-                        Field.Restart();
+                        FieldManager.Restart();
                         AudioManager.PlaySoundType(Enumerators.SoundType.LOSE);
                     }
                     break;

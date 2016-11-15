@@ -30,7 +30,7 @@ public class Enemy : DynamicSquare {
 
         IntVector2 nextPos = GetNextPosition();
         
-        if (!Field.CanEnemyMoveThere(nextPos, _enemyType)) {
+        if (!FieldManager.CanEnemyMoveThere(nextPos, _enemyType)) {
             switch (_enemyDirection) {
                 case Enumerators.EnemyDirection.LD: _enemyDirection = Enumerators.EnemyDirection.RD; break;
                 case Enumerators.EnemyDirection.LU: _enemyDirection = Enumerators.EnemyDirection.RU; break;
@@ -40,7 +40,7 @@ public class Enemy : DynamicSquare {
 
             nextPos = GetNextPosition();
 
-            if (!Field.CanEnemyMoveThere(nextPos, _enemyType)) {
+            if (!FieldManager.CanEnemyMoveThere(nextPos, _enemyType)) {
                 switch (_enemyDirection) {
                     case Enumerators.EnemyDirection.LD: _enemyDirection = Enumerators.EnemyDirection.RU; break;
                     case Enumerators.EnemyDirection.LU: _enemyDirection = Enumerators.EnemyDirection.RD; break;
@@ -51,7 +51,7 @@ public class Enemy : DynamicSquare {
 
             nextPos = GetNextPosition();
 
-            if (!Field.CanEnemyMoveThere(nextPos, _enemyType)) {
+            if (!FieldManager.CanEnemyMoveThere(nextPos, _enemyType)) {
                 switch (_enemyDirection) {
                     case Enumerators.EnemyDirection.LD: _enemyDirection = Enumerators.EnemyDirection.RD; break;
                     case Enumerators.EnemyDirection.LU: _enemyDirection = Enumerators.EnemyDirection.RU; break;
@@ -62,8 +62,8 @@ public class Enemy : DynamicSquare {
         }
         IntVector2 temp = position;
         position = nextPos;
-        Field.UpdateBlock(temp);
-        Field.UpdateBlock(position);
+        FieldManager.UpdateBlock(temp);
+        FieldManager.UpdateBlock(position);
     }
 
     public Enemy(Enumerators.EnemyDirection enemyDirection, Enumerators.EnemyType enemyType, IntVector2 position) : base(position) {

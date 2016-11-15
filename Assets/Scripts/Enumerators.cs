@@ -3,6 +3,19 @@ using System.Collections;
 
 public class Enumerators {
 
+    public enum AppState {
+        MENU,
+        GAME,
+        SCORETAB
+    }
+
+    public enum UIState {
+        PAGE_MAIN_MENU,
+        PAGE_OPTIONS,
+        PAGE_CREDITS,
+        PAGE_SCORETAB,
+    }
+
     public enum EnemyDirection {
         LU, // Left Up
         LD, // Left Down
@@ -32,6 +45,6 @@ public class Enumerators {
     public enum SoundType {
         WIN,
         LOSE,
-        TAB
+        SCORETAB
     }
 }

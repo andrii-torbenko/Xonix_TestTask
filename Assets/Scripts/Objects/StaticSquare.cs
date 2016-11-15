@@ -11,7 +11,7 @@
         get { return _staticType; }
         set {
             _staticType = value;
-            Field.UpdateBlock(position);
+            FieldManager.UpdateBlock(position);
         }
     }
 

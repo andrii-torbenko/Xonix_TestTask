@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-public static class Field {
+public static class FieldManager {
 
     public const int rows = 45;
     public const int cols = 80;
@@ -43,13 +42,18 @@ public static class Field {
     private static Enumerators.PlayerDirection _direction;
 
     public static void Init() {
-        _canvas = GameObject.Find("Canvas");
-        _field = _canvas.transform.Find("Field").gameObject;
-        _blockPrefab = Resources.Load<GameObject>("Prefabs/Image");
-        _playerImg = Resources.Load<Sprite>("Images/Image_MainChar");
-        _enemyGroundImg = Resources.Load<Sprite>("Images/Image_Enemy_Ground");
-        _enemyWaterImg = Resources.Load<Sprite>("Images/Image_Enemy_Water");
-        _direction = Enumerators.PlayerDirection.R;
+        if (!StateManager.isAppStarted) {
+            _canvas = GameObject.Find("Canvas");
+            _field = _canvas.transform.Find("Field").gameObject;
+            _blockPrefab = Resources.Load<GameObject>("Prefabs/Image");
+            _playerImg = Resources.Load<Sprite>("Images/Image_MainChar");
+            _enemyGroundImg = Resources.Load<Sprite>("Images/Image_Enemy_Ground");
+            _enemyWaterImg = Resources.Load<Sprite>("Images/Image_Enemy_Water");
+            _direction = Enumerators.PlayerDirection.R;
+        }
+        else {
+            throw new System.NotImplementedException("Can't initialize field manager more than once");
+        }
     }
 
     public static Enumerators.StaticSquareType GetSquareType(IntVector2 position) {
