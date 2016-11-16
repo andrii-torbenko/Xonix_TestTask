@@ -1,22 +1,24 @@
 ﻿using UnityEngine;
 
 public abstract class Page {
-    private GameObject prefab,
+    protected GameObject prefab,
                        instance;
 
     private static string prefabsPath = "Prefabs/Pages/";
 
     protected string prefabName;
 
-    public bool IsActive() {
-        return instance.activeSelf;
-    }
+    public bool IsActive { get { return instance.activeSelf; } }
 
-    public void Init() {
+    public void Load() {
         prefab = Resources.Load<GameObject>(prefabsPath + prefabName);
+        Debug.Log(prefabsPath + prefabName);
         instance = Object.Instantiate(prefab);
         instance.transform.SetParent(UIManager.Canvas.transform, false);
     }
+
+    public abstract void Init();
+
     public void Show() {
         instance.SetActive(true);
     }

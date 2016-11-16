@@ -7,17 +7,29 @@ public static class DataManager {
 
     private static string _localFilePath = "/playerData.dat";
     public static string appDataPath { get { return Application.persistentDataPath + _localFilePath; } }
-    private static PlayerData _currentData;
+    private static Database _currentDataBase = new Database();
 
     public static void Save() {
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(appDataPath);
 
-        PlayerData data = new PlayerData();
-        PlayerData.WriteData(data, _currentData);
-        bf.Serialize(file, data);
+        Database playersDataBase = new Database();
+
+        foreach (PlayerData pData in _currentDataBase.allPlayers) {
+            playersDataBase.allPlayers.Add(pData);
+        }
+
+        bf.Serialize(file, playersDataBase);
 
         file.Close();
+    }
+
+    public static void AddStat(uint score, string name, uint level) {
+        var playerData = new PlayerData();
+        _currentDataBase.allPlayers.Add(playerData);
+        playerData.score = score;
+        playerData.name = name;
+        playerData.level = level;
     }
 
     public static void Load() {
@@ -25,13 +37,18 @@ public static class DataManager {
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(appDataPath, FileMode.Open);
 
-            PlayerData data = (PlayerData)bf.Deserialize(file);
-            PlayerData.WriteData(_currentData, data);
+            Database data = (Database)bf.Deserialize(file);
+            foreach (PlayerData pData in data.allPlayers) {
+                _currentDataBase.allPlayers.Add(pData);
+            }
             file.Close();
+        }
+        else {
+            _currentDataBase = new Database();
         }
     }
 
-    public static PlayerData currentData { get { return _currentData; } }
+    public static Database currentData { get { return _currentDataBase; } }
 
     public static void Init() {
         if (!StateManager.isAppStarted) {

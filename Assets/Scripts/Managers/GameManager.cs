@@ -5,10 +5,10 @@ using System;
 
 public static class GameManager {
     
-    public static void Init() {
-        FieldManager.Init();
-        AudioManager.Init();
-    }
+    //public static void Init() {
+    //    FieldManager.Init();
+    //    AudioManager.Init();
+    //}
 
     public static void Start() {
         FieldManager.GenerateField();

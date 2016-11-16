@@ -7,15 +7,15 @@
             return _appState;
         }
         set {
+            AudioManager.Stop();
             switch(value) {
                 case Enumerators.AppState.GAME:
                     StartGame();
                     break;
                 case Enumerators.AppState.MENU:
                     OpenMenu();
-                    break;
-                case Enumerators.AppState.SCORETAB:
-                    OpenScoretab();
+                    AudioManager.PlayMusic();
+                    UIManager.ShowPage(Enumerators.UIState.PAGE_MAIN_MENU);
                     break;
             }
             _appState = value;
@@ -29,6 +29,7 @@
             UIManager.Init();
             FieldManager.Init();
             _isAppStarted = true;
+            StateManager.AppState = Enumerators.AppState.MENU;
         }
         else {
             throw new System.NotImplementedException("Can't initialize state manager more than once");
@@ -46,5 +47,9 @@
     private static void OpenScoretab() {
         AudioManager.Stop();
         AudioManager.PlaySoundType(Enumerators.SoundType.SCORETAB);
+    }
+
+    public static void OnCloseApp() {
+        DataManager.Save();
     }
 }

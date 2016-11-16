@@ -5,14 +5,12 @@ public class Enumerators {
 
     public enum AppState {
         MENU,
-        GAME,
-        SCORETAB
+        GAME
     }
 
     public enum UIState {
         PAGE_MAIN_MENU,
         PAGE_OPTIONS,
-        PAGE_CREDITS,
         PAGE_SCORETAB,
     }
 

@@ -7,4 +7,8 @@ public class MainEntryPoint : MonoBehaviour {
     void Start() {
         StateManager.Init();
     }
+
+    void OnApplicationQuit() {
+        StateManager.OnCloseApp();
+    }
 }

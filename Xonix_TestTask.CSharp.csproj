@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>Android:13</UnityBuildTarget>
     <UnityVersion>5.3.4f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -66,7 +68,6 @@
     <Compile Include="Assets\Scripts\Enumerators.cs" />
     <Compile Include="Assets\Scripts\Extensions\IntVector2.cs" />
     <Compile Include="Assets\Scripts\Extensions\SwipeInput.cs" />
-    <Compile Include="Assets\Scripts\Interfaces.cs" />
     <Compile Include="Assets\Scripts\MainEntryPoint.cs" />
     <Compile Include="Assets\Scripts\Managers\AudioManager.cs" />
     <Compile Include="Assets\Scripts\Managers\DataManager.cs" />
@@ -80,6 +81,9 @@
     <Compile Include="Assets\Scripts\Objects\Square.cs" />
     <Compile Include="Assets\Scripts\Objects\StaticSquare.cs" />
     <Compile Include="Assets\Scripts\Page.cs" />
+    <Compile Include="Assets\Scripts\Pages\PageCredits.cs" />
+    <Compile Include="Assets\Scripts\Pages\PageMainMenu.cs" />
+    <Compile Include="Assets\Scripts\Pages\PageOptions.cs" />
     <Compile Include="Assets\Scripts\PlayerData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />

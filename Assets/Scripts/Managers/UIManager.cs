@@ -5,10 +5,9 @@ public static class UIManager {
 
     private static Enumerators.UIState _activePage;
     
-    private static List<Page> _pages;
+    private static List<Page> _pages = new List<Page>();
 
-    private static Page _pageCredits,
-                        _pageMainMenu,
+    private static Page _pageMainMenu,
                         _pageOptions,
                         _pageScoretab;
 
@@ -34,9 +33,6 @@ public static class UIManager {
             _pages[i].Hide();
         }
         switch (page) {
-            case Enumerators.UIState.PAGE_CREDITS:
-                _pageCredits.Show();
-                break;
             case Enumerators.UIState.PAGE_MAIN_MENU:
                 _pageMainMenu.Show();
                 break;
@@ -53,12 +49,16 @@ public static class UIManager {
         if (!StateManager.isAppStarted) {
             _canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 
-            _pages.Add(_pageCredits);
+            _pageOptions = new PageOptions();
+            _pageMainMenu = new PageMainMenu();
+            _pageScoretab = new PageScoreTab();
+
+            _pages.Add(_pageScoretab);
             _pages.Add(_pageMainMenu);
             _pages.Add(_pageOptions);
-            _pages.Add(_pageScoretab);
 
             for (var i = 0; i < _pages.Count; i++) {
+                _pages[i].Load();
                 _pages[i].Init();
             }
         }

@@ -6,7 +6,8 @@ public static class AudioManager {
 
     private static AudioClip _winSound,
                              _loseSound,
-                             _tabSound;
+                             _tabSound,
+                             _music;
 
     public static void Init() {
         if (!StateManager.isAppStarted) {
@@ -14,6 +15,7 @@ public static class AudioManager {
             _winSound = Resources.Load<AudioClip>("Sounds/Xonix_Win");
             _loseSound = Resources.Load<AudioClip>("Sounds/Xonix_Lose");
             _tabSound = Resources.Load<AudioClip>("Sounds/Xonix_Scoretab");
+            _music = Resources.Load<AudioClip>("Sounds/Xonix_Music");
         }
         else {
             throw new System.NotImplementedException("Can't initialize audio manager more than once");
@@ -21,6 +23,8 @@ public static class AudioManager {
     }
 
     public static void PlaySoundType(Enumerators.SoundType soundType) {
+        _audioSource.Stop();
+        _audioSource.loop = false;
         switch (soundType) {
             case Enumerators.SoundType.WIN:
                 _audioSource.PlayOneShot(_winSound);
@@ -34,10 +38,26 @@ public static class AudioManager {
         }
     }
 
+    public static void PlayMusic() {
+        _audioSource.Stop();
+        _audioSource.loop = true;
+        _audioSource.clip = _music;
+        _audioSource.Play();
+    }
+
     public static void Stop() {
         _audioSource.Stop();
     }
 
+    public static bool Mute() {
+        if (!_audioSource.mute) {
+            _audioSource.mute = true;
+        }
+        else {
+            _audioSource.mute = false;
+        }
+        return _audioSource.mute;
+    }
     //public static void PlaySound(AudioClip clip) {
     //    _audioSource.loop = true;
     //    _audioSource.PlayOneShot(clip);
