@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-//[System.Serializable]
+[System.Serializable]
 public class PlayerData {
     public uint score = 0;
     public string name = "";

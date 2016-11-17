@@ -2,10 +2,17 @@
 using System.Collections;
 
 public class MainEntryPoint : MonoBehaviour {
+    
+
+    void Awake() {
+        StateManager.Init();
+    }
 
     // Use this for initialization
     void Start() {
-        StateManager.Init();
+    }
+
+    void Update() {
     }
 
     void OnApplicationQuit() {

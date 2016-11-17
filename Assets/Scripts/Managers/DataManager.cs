@@ -48,6 +48,20 @@ public static class DataManager {
         }
     }
 
+    public static int DBCount { get { return _currentDataBase.allPlayers.Count; } }
+
+    public static string GetNameByIndex(int index) {
+        return _currentDataBase.allPlayers[index].name;
+    }
+
+    public static uint GetScoreByIndex(int index) {
+        return _currentDataBase.allPlayers[index].score;
+    }
+
+    public static uint GetLevelByIndex(int index) {
+        return _currentDataBase.allPlayers[index].level;
+    }
+
     public static Database currentData { get { return _currentDataBase; } }
 
     public static void Init() {

@@ -13,6 +13,10 @@ public static class UIManager {
 
     private static Canvas _canvas;
 
+    private static GameObject _background;
+
+    private static GameObject _authorText;
+
     public static Canvas Canvas
     {
         get { return _canvas; }
@@ -29,6 +33,8 @@ public static class UIManager {
     }
 
     public static void ShowPage(Enumerators.UIState page) {
+        _background.SetActive(true);
+        _authorText.SetActive(true);
         for (var i = 0; i < _pages.Count; i++) {
             _pages[i].Hide();
         }
@@ -45,10 +51,20 @@ public static class UIManager {
         }
     }
 
+    public static void HideAll() {
+        for (var i = 0; i < _pages.Count; i++) {
+            _pages[i].Hide();
+        }
+        _background.SetActive(false);
+        _authorText.SetActive(false);
+    }
+
     public static void Init() {
         if (!StateManager.isAppStarted) {
             _canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 
+            _background = _canvas.transform.Find("Image_Background").gameObject;
+            _authorText = _canvas.transform.Find("Text_Author").gameObject;
             _pageOptions = new PageOptions();
             _pageMainMenu = new PageMainMenu();
             _pageScoretab = new PageScoreTab();
