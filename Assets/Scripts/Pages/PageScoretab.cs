@@ -1,31 +1,77 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PageScoreTab : Page {
 
     private Button _buttonSound,
-                   _buttonBack;
+                   _buttonBack,
+                   _buttonSave;
     private GameObject _playerPanelPrefab,
-                       _playerPanelHandler;
+                       _playerPanelHandler,
+                       _popupInputField;
+    private Text _inputField;
     public override void Init() {
-        _buttonBack = instance.transform.Find("Button_Back").GetComponent<Button>();
-        _buttonBack.onClick.AddListener(OnBack);
 
+        _buttonBack = instance.transform.Find("Button_Back").GetComponent<Button>();
         _playerPanelHandler = instance.transform.Find("ScrollRect_Scores/Grid_Players").gameObject;
         _playerPanelPrefab = _playerPanelHandler.transform.Find("Panel_Player").gameObject;
 
+        _popupInputField = instance.transform.Find("Popup_InputFieldBackground").gameObject;
+        _inputField = _popupInputField.transform.Find("InputField/Input_Name").GetComponent<Text>();
+        _buttonSave = _popupInputField.transform.Find("InputField/Button_Save").GetComponent<Button>();
+
+        _buttonBack.onClick.AddListener(OnBack);
+        _buttonSave.onClick.AddListener(OnSave);
+        _inputField.transform.parent.GetComponent<InputField>().onEndEdit.AddListener(delegate { OnSave(); });
+
+        UpdateTab();
+
+        HidePopup(null);
+    }
+
+    public void UpdateTab() {
+        List<GameObject> destroyingList = new List<GameObject>();
+
+        for (int i = 1; i < _playerPanelHandler.transform.childCount; i++) {
+            destroyingList.Add(_playerPanelHandler.transform.GetChild(i).gameObject);
+        }
+
+        foreach (GameObject go in destroyingList) {
+            Object.Destroy(go);
+        }
+
+        _playerPanelPrefab = _playerPanelHandler.transform.GetChild(0).gameObject;
+        _playerPanelPrefab.SetActive(true);
         for (int i = 0; i < DataManager.DBCount; i++) {
-            GameObject new_instance = GameObject.Instantiate(_playerPanelPrefab);
+            GameObject new_instance = Object.Instantiate(_playerPanelPrefab);
             new_instance.transform.SetParent(_playerPanelHandler.transform, false);
-            new_instance.transform.Find("Text_Position").GetComponent<Text>().text = (i + 1).ToString();
+            new_instance.transform.Find("Text_Position").GetComponent<Text>().text = (i + 1).ToString() + ".";
             new_instance.transform.Find("Text_Name").GetComponent<Text>().text = DataManager.GetNameByIndex(i);
             new_instance.transform.Find("Text_Score").GetComponent<Text>().text = DataManager.GetScoreByIndex(i).ToString();
             new_instance.transform.Find("Text_Level").GetComponent<Text>().text = DataManager.GetLevelByIndex(i).ToString();
 
         }
 
-        GameObject.Destroy(_playerPanelPrefab);
+        Object.Destroy(_playerPanelPrefab);
+    }
+
+    public void ShowPopup() {
+        _popupInputField.SetActive(true);
+        _inputField.transform.parent.GetComponent<Animator>().Play("InputFieldDrop");
+    }
+
+    public void HidePopup(object[] args) {
+        _popupInputField.SetActive(false);
+    }
+
+    public void OnSave() {
+        if (_inputField.text.Length > 0) {
+            DataManager.AddStat(DataManager.CurrentScore, _inputField.text, DataManager.CurrentLevel);
+            _inputField.transform.parent.GetComponent<Animator>().Play("InputFieldClose");
+            TimeManager.AddTimer(HidePopup, null, false, Time.time + 0, 0, Time.time + 1.3f);
+        }
     }
 
     public void OnBack() {

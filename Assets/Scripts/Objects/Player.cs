@@ -1,82 +1,91 @@
-﻿//using UnityEngine;
+﻿using UnityEngine;
 
-//public class Player : DynamicSquare {
+public class Player {
+    private IntVector2 _position;
+    private bool _isMoving = false,
+                 _isLeavingTrack = false;
+    private Enumerators.PlayerDirection _dir = Enumerators.PlayerDirection.R;
 
-//    private bool _isMoving = false;
+    public Enumerators.PlayerDirection Direction
+    {
+        get { return _dir; }
+        set { _dir = value; }
+    }
 
-//    private bool _isLeavingTrack = false;
+    public bool IsLeavingTrack { get { return _isLeavingTrack; } }
 
-//    public bool IsMoving
-//    {
-//        get { return _isMoving; }
-//    }
+    public bool IsMoving {
+        get { return _isMoving; }
+        set { _isMoving = value; }
+    }
 
-//    private Enumerators.PlayerDirection _playerDirection;
+    public IntVector2 Position
+    {
+        get { return _position; }
+        set { _position = value; }
+    }
 
-//    public Enumerators.PlayerDirection PlayerDirection
-//    {
-//        get { return _playerDirection; }
-//        set
-//        {
-//            _isMoving = true;
-//            _playerDirection = value;
-//        }
-//    }
+    public void StartMoving() {
+        _isMoving = true;
+    }
 
-//    public void ResetPlayer() {
-//        position = new IntVector2(FieldManager.cols / 2, 0);
-//        _isLeavingTrack = false;
-//        _isMoving = false;
-//    }
+    private IntVector2 GetNextPosition() {
+        IntVector2 nextPos = new IntVector2(_position.x, _position.y);
+        switch (_dir) {
+            case Enumerators.PlayerDirection.U:
+                nextPos.MoveU();
+                break;
+            case Enumerators.PlayerDirection.D:
+                nextPos.MoveD();
+                break;
+            case Enumerators.PlayerDirection.L:
+                nextPos.MoveL();
+                break;
+            case Enumerators.PlayerDirection.R:
+                nextPos.MoveR();
+                break;
+        }
+        return nextPos;
+    }
 
-//    public override void Move() {
+    public void Move() {
+        IntVector2 nextPos = GetNextPosition();
+        if (GameManager.IsOutOfRange(nextPos)) {
+            _isMoving = false;
+            return;
+        }
+        else {
+            //if (!_isLeavingTrack && FieldManager.GetType(nextPos) == FieldManager.SquareType.WATER) {
+            //    _isLeavingTrack = true;
+            //}
+            //if (_isLeavingTrack && FieldManager.GetType(nextPos) == FieldManager.SquareType.GROUND) {
+            //    _isLeavingTrack = false;
+            //    _isMoving = false;
+            //}
+            if (_isMoving) _position = nextPos;
 
-//        if (!_isMoving) return;
-
-//        IntVector2 nextPos = position;
-//        switch (_playerDirection) {
-//            case Enumerators.PlayerDirection.L: nextPos += new IntVector2(-1, 0); break;
-//            case Enumerators.PlayerDirection.R: nextPos += new IntVector2(1, 0); break;
-//            case Enumerators.PlayerDirection.U: nextPos += new IntVector2(0, -1); break;
-//            case Enumerators.PlayerDirection.D: nextPos += new IntVector2(0, 1); break;
-//        }
-
-//        if (nextPos.x >= 0 && nextPos.y >= 0 && nextPos.x < FieldManager.cols && nextPos.y < FieldManager.rows) {
-//            IntVector2 temp = position;
-//            position = nextPos;
-            
-//            Enumerators.StaticSquareType nextSquareType = FieldManager.GetSquareType(position);
-
-//            switch (nextSquareType) {
-//                case Enumerators.StaticSquareType.WTR:
-//                    FieldManager.AddTrack(position);
-//                    _isLeavingTrack = true;
-//                    break;
-//                case Enumerators.StaticSquareType.GRD:
-//                    if (_isLeavingTrack) {
-//                        _isMoving = false;
-//                        _isLeavingTrack = false;
-//                        FieldManager.SeizeFieldsWithNoEnemies();
-//                        Debug.Log("Need to seize ground.");
-//                    }
-//                    break;
-//                case Enumerators.StaticSquareType.TRK:
-//                    if (_isLeavingTrack) {
-//                        _isMoving = false;
-//                        FieldManager.Restart();
-//                        AudioManager.PlaySoundType(Enumerators.SoundType.LOSE);
-//                    }
-//                    break;
-//            }
-//        }
-//        else {
-//            _isMoving = false;
-//        }
-//    }
-
-//    public Player(Enumerators.PlayerDirection playerDirection, IntVector2 position) : base(position) {
-//        _playerDirection = playerDirection;
-//    }
-//}
+            if (_isLeavingTrack) {
+                if (GameManager.GetType(nextPos) == GameManager.SquareType.GROUND) {
+                    _isLeavingTrack = false;
+                    _isMoving = false;
+                    GameManager.SeizeField();
+                }
+            }
+            else {
+                if (GameManager.GetType(nextPos) == GameManager.SquareType.WATER) {
+                    _isLeavingTrack = true;
+                }
+            }
 
 
+            if (_isLeavingTrack) {
+                GameManager.LeaveTrack(_position);
+            }
+        }
+    }
+
+    public Player(IntVector2 position) {
+        _position = position;
+    }
+
+}

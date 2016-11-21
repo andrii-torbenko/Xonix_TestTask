@@ -27,9 +27,9 @@
             DataManager.Init();
             AudioManager.Init();
             UIManager.Init();
-            FieldManager.Init();
+            GameManager.Init();
             _isAppStarted = true;
-            FieldManager.HideField();
+            GameManager.HideField();
             StateManager.AppState = Enumerators.AppState.MENU;
         }
         else {
@@ -40,8 +40,8 @@
     private static void StartGame() {
         AudioManager.Stop();
         UIManager.HideAll();
-        FieldManager.ShowField();
-        FieldManager.ResetField();
+        GameManager.ShowField();
+        GameManager.ResetField();
     }
 
     private static void OpenMenu() {

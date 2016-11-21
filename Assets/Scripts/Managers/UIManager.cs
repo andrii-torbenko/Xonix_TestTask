@@ -47,6 +47,7 @@ public static class UIManager {
                 break;
             case Enumerators.UIState.PAGE_SCORETAB:
                 _pageScoretab.Show();
+                //((PageScoreTab)_pageScoretab).ShowPopup();
                 break;
         }
     }
@@ -57,6 +58,15 @@ public static class UIManager {
         }
         _background.SetActive(false);
         _authorText.SetActive(false);
+    }
+
+    public static void UpdateScoretab() {
+        ((PageScoreTab)_pageScoretab).UpdateTab();
+    }
+
+    public static void OpenScoretabWithInput() {
+        ShowPage(Enumerators.UIState.PAGE_SCORETAB);
+        ((PageScoreTab)_pageScoretab).ShowPopup();
     }
 
     public static void Init() {

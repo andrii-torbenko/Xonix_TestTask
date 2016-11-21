@@ -13,6 +13,11 @@ public class MainEntryPoint : MonoBehaviour {
     }
 
     void Update() {
+        TimeManager.Update();
+        if (!GameManager.IsPaused) {
+            SwipeInput.SetDirection();
+            GameManager.Update();
+        }
     }
 
     void OnApplicationQuit() {

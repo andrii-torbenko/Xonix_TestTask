@@ -11,7 +11,7 @@ public class PageOptions : Page {
 
     public override void Init() {
         _buttonSound = instance.transform.Find("Grid_Buttons/Button_Sound").GetComponent<Button>();
-        _buttonBack = instance.transform.Find("Grid_Buttons/Button_Back").GetComponent<Button>();
+        _buttonBack = instance.transform.Find("Button_Back").GetComponent<Button>();
 
         _buttonSound.onClick.AddListener(OnSound);
         _buttonBack.onClick.AddListener(OnBack);

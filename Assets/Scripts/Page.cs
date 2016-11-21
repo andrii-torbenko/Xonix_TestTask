@@ -12,7 +12,6 @@ public abstract class Page {
 
     public void Load() {
         prefab = Resources.Load<GameObject>(prefabsPath + prefabName);
-        Debug.Log(prefabsPath + prefabName);
         instance = Object.Instantiate(prefab);
         instance.transform.SetParent(UIManager.Canvas.transform, false);
     }
