@@ -8,9 +8,11 @@ public class PageScoreTab : Page {
     private Button _buttonSound,
                    _buttonBack,
                    _buttonSave;
+
     private GameObject _playerPanelPrefab,
                        _playerPanelHandler,
                        _popupInputField;
+
     private Text _inputField;
     public override void Init() {
 
@@ -54,11 +56,18 @@ public class PageScoreTab : Page {
 
         }
 
-        Object.Destroy(_playerPanelPrefab);
+        if (DataManager.DBCount > 0) Object.Destroy(_playerPanelPrefab);
+        else {
+            _playerPanelPrefab.transform.Find("Text_Position").GetComponent<Text>().text = (1).ToString() + ".";
+            _playerPanelPrefab.transform.Find("Text_Name").GetComponent<Text>().text = "Can be you";
+            _playerPanelPrefab.transform.Find("Text_Score").GetComponent<Text>().text = "VERY HIGH";
+            _playerPanelPrefab.transform.Find("Text_Level").GetComponent<Text>().text = "INF";
+        }
     }
 
     public void ShowPopup() {
         _popupInputField.SetActive(true);
+        _buttonSave.interactable = true;
         _inputField.transform.parent.GetComponent<Animator>().Play("InputFieldDrop");
     }
 
@@ -68,9 +77,13 @@ public class PageScoreTab : Page {
 
     public void OnSave() {
         if (_inputField.text.Length > 0) {
-            DataManager.AddStat(DataManager.CurrentScore, _inputField.text, DataManager.CurrentLevel);
-            _inputField.transform.parent.GetComponent<Animator>().Play("InputFieldClose");
-            TimeManager.AddTimer(HidePopup, null, false, Time.time + 0, 0, Time.time + 1.3f);
+            if (_buttonSave.interactable) {
+                _buttonSave.interactable = false;
+                DataManager.AddStat((uint)GameManager.Score, _inputField.text, (uint)GameManager.Level);
+                _inputField.transform.parent.GetComponent<Animator>().Play("InputFieldClose");
+                TimeManager.AddTimer(HidePopup, null, false, Time.time + 0, 0, Time.time + 1.3f);
+                AudioManager.PlayMusic();
+            }
         }
     }
 

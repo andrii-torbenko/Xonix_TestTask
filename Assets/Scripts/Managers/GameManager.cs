@@ -1,373 +1,530 @@
-﻿//using UnityEngine;
-//using System.Collections.Generic;
-//using UnityEngine.UI;
+﻿using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
-//public static class FieldManager {
+public static class GameManager {
 
-//    public const int rows = 45;
-//    public const int cols = 80;
+    private static int _lives = 2,
+                        _score = 0,
+                        _level = 1,
+                        _defEnemiesGroundCount = 1,
+                        _defEenemiesWaterCount = 1,
+                        _enemiesGroundCount = 1,
+                        _enemiesWaterCount = 1,
+                        _completed = 0,
+                        _notCountedSurroundBlocks = 0,
+                        _borderComplToWin = 75,
+                        _rangeBetweenOnSpawn = 2,
+                        _scoreMultiplier = 2;
+    private static float _enemiesGroundAddRate = 0.4f,
+                         _enemiesWaterAddRate = 0.5f,
+                         _timeAlive = 0,
+                         _maxTimeAlive = 60,
+                         _nextPlayTime = 0,
+                         _updateDelay = 0.07f;
 
-//    private static GameObject _canvas,
-//                              _field,
-//                              _blockPrefab;
-//    private static GameObject[,] _sceneBlocks = new GameObject[rows, cols];
+    private const int _blocksX = 64,
+                      _blocksY = 36;
+    
+    private static bool _isPaused = false,
+                        _wasPaused = false;
 
-
-//    public static Player player = new Player(Enumerators.PlayerDirection.D, new IntVector2(cols / 2, 0));
-
-//    private static StaticSquare[,] _staticBackground = new StaticSquare[rows, cols];
-//    private static List<StaticSquare> _tracks = new List<StaticSquare>();
-//    private static List<Enemy> _enemies = new List<Enemy>();
-//    private static List<StaticSquare> _tempSelectedSquares = new List<StaticSquare>();
-
-
-//    private static Color _groundColor = Color.cyan,
-//                         _trackColor = Color.magenta,
-//                         _waterColor = Color.black,
-//                         _enemyColorWater = Color.red,
-//                         _enemyColorGround = Color.yellow,
-//                         _playerColor = Color.blue;
-
-//    private static Sprite _playerImg,
-//                          _enemyGroundImg,
-//                          _enemyWaterImg;
-
-//    private static float _nextMoveTime = 0;
-//    private static float _moveDeltaTime = .08f;
-
-//    private static float _swipeMinDelta = 1.5f;
-
-//    private static bool _isMoving = true;
-
-//    private static Enumerators.PlayerDirection _direction;
-
-//    public static void Init() {
-//        if (!StateManager.isAppStarted) {
-//            _canvas = GameObject.Find("Canvas");
-//            _field = _canvas.transform.Find("Field").gameObject;
-//            _blockPrefab = Resources.Load<GameObject>("Prefabs/Image");
-//            _playerImg = Resources.Load<Sprite>("Images/Image_MainChar");
-//            _enemyGroundImg = Resources.Load<Sprite>("Images/Image_Enemy_Ground");
-//            _enemyWaterImg = Resources.Load<Sprite>("Images/Image_Enemy_Water");
-//            _direction = Enumerators.PlayerDirection.R;
-//        }
-//        else {
-//            throw new System.NotImplementedException("Can't initialize field manager more than once");
-//        }
-//    }
-
-//    public static Enumerators.StaticSquareType GetSquareType(IntVector2 position) {
-//        return _staticBackground[position.y, position.x].StaticType;
-//    }
-
-//    public static void AddEnemy() {
-//        _enemies.Add(new Enemy(Enumerators.EnemyType.EWT, new IntVector2(cols / 2, rows / 2)));
-//    }
-
-//    public static void GenerateField() {
-//        if (_sceneBlocks[0, 0] == null) {
-//            for (var i_c = 0; i_c < cols; i_c++) {
-//                for (var i_r = 0; i_r < rows; i_r++) {
-//                    GameObject currentBlock = GameObject.Instantiate(_blockPrefab);
-//                    currentBlock.transform.SetParent(_field.transform, false);
-//                    _sceneBlocks[i_r, i_c] = currentBlock;
-
-//                    if ((i_c < 2 || i_c > cols - 3) || (i_r < 2 || i_r > rows - 3)) {
-//                        _staticBackground[i_r, i_c] = new StaticSquare(Enumerators.StaticSquareType.GRD, new IntVector2(i_c, i_r));
-//                    }
-//                    else {
-//                        _staticBackground[i_r, i_c] = new StaticSquare(Enumerators.StaticSquareType.WTR, new IntVector2(i_c, i_r));
-//                    }
-//                }
-//            }
-//        }
-//        else {
-//            for (var i_c = 0; i_c < cols; i_c++) {
-//                for (var i_r = 0; i_r < rows; i_r++) {
-//                    if ((i_c < 2 || i_c > cols - 3) || (i_r < 2 || i_r > rows - 3)) {
-//                        _staticBackground[i_r, i_c] = new StaticSquare(Enumerators.StaticSquareType.GRD, new IntVector2(i_c, i_r));
-//                    }
-//                    else {
-//                        _staticBackground[i_r, i_c] = new StaticSquare(Enumerators.StaticSquareType.GRD, new IntVector2(i_c, i_r));
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//    public static void DeleteEnemy() {
-//        if (_enemies.Count > 0) _enemies.RemoveAt(0);
-//    }
-
-//    public static void ClearAll() {
-//        for (int i = 0; i < _enemies.Count; i++) {
-//            _enemies.RemoveAt(i);
-//        }
-//        for (int i = 0; i < _tracks.Count; i++) {
-//            _tracks.RemoveAt(i);
-//        }
-//    }
-
-//    public static bool CanEnemyMoveThere(IntVector2 position, Enumerators.EnemyType enemyType) {
-//        if (NotOutOfRange(position)) {
-//            if (GetSquareType(position) == Enumerators.StaticSquareType.WTR && enemyType == Enumerators.EnemyType.EWT) {
-//                return true;
-//            }
-//            else if (GetSquareType(position) == Enumerators.StaticSquareType.GRD && enemyType == Enumerators.EnemyType.EGR) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-//    public static void Restart() {
-//        GenerateField();
-//        ClearAll();
-//        AddEnemy();
-//        player.ResetPlayer();
-//        UpdateField();
-//    }
-
-//    public static StaticSquare GetBackGroundSquare(IntVector2 position) {
-//        return _staticBackground[position.y, position.x];
-//    }
-
-//    public static StaticSquare GetBackGroundSquareXY(int x, int y) {
-//        return _staticBackground[y, x];
-//    }
-
-//    private static bool NotOutOfRange(IntVector2 position) {
-//        if (position.x >= 0 && position.x < cols && position.y >= 0 && position.y < rows) return true;
-//        return false;
-//    }
-
-//    private static bool IsWater(IntVector2 position) {
-//        if (_staticBackground[position.y, position.x].StaticType == Enumerators.StaticSquareType.WTR) return true;
-//        return false;
-//    }
-
-//    private static Enemy EnemyHere(IntVector2 position) {
-//        for (int i = 0; i < _enemies.Count; i++) {
-//            if (_enemies[i].Position == position) return _enemies[i];
-//        }
-//        return null;
-//    }
-
-//    private static bool IsTrackHere(IntVector2 position) {
-//        for (int i = 0; i < _tracks.Count; i++) {
-//            if (_tracks[i].Position == position) return true;
-//        }
-//        return false;
-//    }
-
-//    private static Image GetBackgroundImage(IntVector2 position) {
-//        return _sceneBlocks[position.y, position.x].GetComponent<Image>();
-//    }
-
-//    public static void UpdateBlock(IntVector2 position) {
-//        Image square = GetBackgroundImage(position);
-//        Enemy enemy = EnemyHere(position);
-//        if (player.Position == position) {
-//            square.color = Color.white;
-//            square.sprite = _playerImg;
-//        }
-//        else if (enemy != null) {
-//            square.color = Color.white;
-//            switch (enemy.EnemyType) {
-//                case Enumerators.EnemyType.EGR:
-//                    square.sprite = _enemyGroundImg;
-//                    break;
-//                case Enumerators.EnemyType.EWT:
-//                    square.sprite = _enemyWaterImg;
-//                    break;
-//            }
-//        }
-//        else {
-//            square.sprite = null;
-//            switch (GetSquareType(position)) {
-//                case Enumerators.StaticSquareType.GRD:
-//                    square.color = _groundColor;
-//                    break;
-//                case Enumerators.StaticSquareType.WTR:
-//                    square.color = _waterColor;
-//                    break;
-//                case Enumerators.StaticSquareType.TRK:
-//                    square.color = _trackColor;
-//                    break;
-//            }
-//        }
-//    }
-
-//    public static void UpdateField() {
-//        for (var i_c = 0; i_c < cols; i_c++) {
-//            for (var i_r = 0; i_r < rows; i_r++) {
-//                Image sceneBlockImg = _sceneBlocks[i_r, i_c].GetComponent<Image>();
-//                sceneBlockImg.sprite = null;
-//                switch (_staticBackground[i_r, i_c].StaticType) {
-//                    case Enumerators.StaticSquareType.GRD:
-//                        sceneBlockImg.color = _groundColor;
-//                        break;
-//                    case Enumerators.StaticSquareType.WTR:
-//                        sceneBlockImg.color = _waterColor;
-//                        break;
-//                }
-//            }
-//        }
+    private static string _textPaused = "Paused",
+                          _textStartGame = "Tap to play";
 
 
-//        foreach (StaticSquare track in _tracks) {
-//            GetBackgroundImage(track.Position).color = _trackColor;
-//        }
+    public static int MaxX { get { return _blocksX; } }
+    public static int MaxY { get { return _blocksY; } }
+    public static bool IsPaused
+    {
+        get { return _isPaused; }
+        set {
+            if (!value) _nextPlayTime = Time.time;
+            _buttonScreen.gameObject.SetActive(value);
+            _textMainEvent.gameObject.SetActive(value);
+            _textMainEvent.text = _textPaused;
+            _isPaused = value;
+        }
+    }
+    public static float TimeAlive
+    {
+        get { return _timeAlive; }
+        private set
+        {
+            _timeAlive = value;
+            _textTimeAlive.text = "Time: " + ((int)_timeAlive).ToString();
+        }
+    }
+
+    public static int Lives
+    {
+        get { return _lives; }
+        private set
+        {
+            _lives = value;
+            _textLives.text = "Lives: " + _lives.ToString();
+        }
+    }
+    public static int Score
+    {
+        get { return _score; }
+        private set
+        {
+            _score = value;
+            _textScore.text = "Score: " + _score.ToString();
+        }
+    }
+    public static int Level
+    {
+        get { return _level; }
+        private set
+        {
+            _level = value;
+            _textLevel.text = "Level: " + _level.ToString();
+        }
+    }
+    public static int Completed
+    {
+        get { return _completed; }
+        private set
+        {
+            _completed = value;
+            _textCompleted.text = "Compl: " + _completed.ToString();
+        }
+    }
+    public static IntVector2 playerPosition
+    {
+        get { return _player.Position; }
+    }
 
 
-//        foreach (Enemy enemy in _enemies) {
-//            switch (enemy.EnemyType) {
-//                case Enumerators.EnemyType.EGR:
-//                    _sceneBlocks[enemy.Position.y, enemy.Position.x].GetComponent<Image>().color = Color.white;
-//                    _sceneBlocks[enemy.Position.y, enemy.Position.x].GetComponent<Image>().sprite = _enemyGroundImg;
-//                    break;
-//                case Enumerators.EnemyType.EWT:
-//                    _sceneBlocks[enemy.Position.y, enemy.Position.x].GetComponent<Image>().color = Color.white;
-//                    _sceneBlocks[enemy.Position.y, enemy.Position.x].GetComponent<Image>().sprite = _enemyWaterImg;
-//                    break;
-//            }
-//        }
+    private static Player _player = new Player(new IntVector2(_blocksX / 2, 0));
+
+    private static Image[,] _sceneImgs   = new Image[_blocksX, _blocksY];
+    private static Enumerators.SquareType[,] _typePixels = new Enumerators.SquareType[_blocksX, _blocksY];
+
+    private static List<IntVector2> _trackList = new List<IntVector2>();
+
+    private static Button _buttonPause,
+                          _buttonBack,
+                          _buttonScreen;
+
+    private static Text _textLevel,
+                        _textScore,
+                        _textLives,
+                        _textCompleted,
+                        _textMainEvent,
+                        _textTimeAlive;
+
+    private static GameObject _field,
+                       _blockPrefab;
+
+    private static Sprite _playerImg,
+                   _enemyGroundImg,
+                   _enemyWaterImg;
+
+    private static Color _purpleDarkColor = new Color(0.11f, 0, 0.19f),
+                         _purpleLightColor = new Color(0.4f, 0.01f, 0.98f),
+                         _groundColor = _purpleLightColor,
+                         _trackColor = Color.white,
+                         _waterColor = Color.black,
+                         _enemyColorWater = _purpleLightColor,
+                         _enemyColorGround = _purpleLightColor,
+                         _playerColor = _purpleLightColor;
+
+    private static List<Enemy> _enemies = new List<Enemy>();
+
+    public static void Init() {
+        _field = UIManager.Canvas.transform.Find("Main_Game/Field").gameObject;
+        _blockPrefab = Resources.Load<GameObject>("Prefabs/Image");
+        _playerImg = Resources.Load<Sprite>("Images/Image_MainChar");
+        _enemyGroundImg = Resources.Load<Sprite>("Images/Image_Enemy_Ground");
+        _enemyWaterImg = Resources.Load<Sprite>("Images/Image_Enemy_Water");
+
+        var mainPage = _field.transform.parent;
+
+        _buttonPause = mainPage.Find("Button_Pause").GetComponent<Button>();
+        _buttonBack = mainPage.Find("Button_Back").GetComponent<Button>();
+        _buttonScreen = mainPage.Find("Button_Screen").GetComponent<Button>();
+        _textMainEvent = mainPage.Find("Text_MainGameEvent").GetComponent<Text>();
+        var gridText = _field.transform.parent.Find("Grid_Text");
+        
+        _textLevel = gridText.transform.Find("Text_Level").GetComponent<Text>();
+        _textLives = gridText.transform.Find("Text_Lives").GetComponent<Text>();
+        _textScore = gridText.transform.Find("Text_Score").GetComponent<Text>();
+        _textCompleted = gridText.transform.Find("Text_Completed").GetComponent<Text>();
+        _textTimeAlive = gridText.transform.Find("Text_TimeAlive").GetComponent<Text>();
+
+        _buttonPause.onClick.AddListener(PauseGame);
+        _buttonBack.onClick.AddListener(OpenMenu);
+        _buttonScreen.onClick.AddListener(StartGame);
+
+        for (int x = 0; x < _blocksX; x++) {
+            for (int y = 0; y < _blocksY; y++) {
+                GameObject new_instance = Object.Instantiate(_blockPrefab);
+                _sceneImgs[x, y] = new_instance.GetComponent<Image>();
+                new_instance.transform.SetParent(_field.transform, false);
+            }
+        }
+    }
 
 
-//        GetBackgroundImage(player.Position).color = Color.white;
-//        GetBackgroundImage(player.Position).sprite = _playerImg;
+    #region buttonActions
+    public static void StartGame() {
+        if (_buttonScreen.interactable) {
+            //ResetScore();
+            _buttonScreen.interactable = false;
+            IsPaused = false;
+            ResetField();
+            _buttonScreen.gameObject.SetActive(false);
+            _textMainEvent.gameObject.SetActive(false);
+        }
+    }
 
-//    }
+    public static void PauseGame() {
+        if (_isPaused) {
+            IsPaused = false;
+        }
+        else {
+            IsPaused = true;
+        }
+    }
 
-//    public static void AddTrack(IntVector2 position) {
-//        _tracks.Add(_staticBackground[position.y, position.x]);
-//        _staticBackground[position.y, position.x].StaticType = Enumerators.StaticSquareType.TRK;
-//    }
+    public static void OpenMenu() {
+        QuitGame();
+        IsPaused = false;
+        StateManager.AppState = Enumerators.AppState.MENU;
+        UIManager.ActivePage = Enumerators.UIState.PAGE_MAIN_MENU;
+    }
+    #endregion
 
-//    public static bool IsRangeOk(int x, int y) {
-//        if (x >= 0 && x < cols && y >= 0 && y < rows) return true;
-//        return false;
-//    }
+    #region base
+    public static void HideField() {
+        _field.transform.parent.gameObject.SetActive(false);
+    }
 
-//    public static void UpdatePositions() {
-//        if (Time.time > _nextMoveTime) {
-//            for (int i = 0; i < ((Time.time - _nextMoveTime) / _moveDeltaTime); i++) {
-//                foreach (Enemy enemy in _enemies) {
-//                    enemy.Move();
-//                }
-//                player.Move();
-//            }
-//            _nextMoveTime = Time.time + _moveDeltaTime;
-//        }
-//    }
+    public static void ShowField() {
+        _field.transform.parent.gameObject.SetActive(true);
+        ResetScore();
+    }
+    #endregion
 
-//    private static void GetSurroundSquares(IntVector2 position, List<StaticSquare> originalList, List<StaticSquare> checkingList, List<StaticSquare> surroundSquares) {
-//        int nextPos_x = position.x + 1,
-//            nextPos_y = position.y;
-//        StaticSquare square = GetBackGroundSquareXY(nextPos_x, nextPos_y);
-//        if (!originalList.Contains(square) && !surroundSquares.Contains(square) && square.StaticType == Enumerators.StaticSquareType.WTR) {
-//            surroundSquares.Add(square);
-//        }
+    #region instanceCreating
 
-//        nextPos_x = position.x - 1;
-//        nextPos_y = position.y;
-//        square = GetBackGroundSquareXY(nextPos_x, nextPos_y);
-//        if (!originalList.Contains(square) && !surroundSquares.Contains(square) && square.StaticType == Enumerators.StaticSquareType.WTR) {
-//            surroundSquares.Add(square);
-//        }
+    public static void AddWaterEnemy(int posx) {
+        _enemies.Add(new Enemy(new IntVector2(posx, _blocksY / 2), Enumerators.EnemyType.EWT));
+    }
+    
+    public static void AddGroundEnemy(int posx) {
+        _enemies.Add(new Enemy(new IntVector2(posx, _blocksY - 1), Enumerators.EnemyType.EGR));
+    }
 
-//        nextPos_x = position.x;
-//        nextPos_y = position.y - 1;
-//        square = GetBackGroundSquareXY(nextPos_x, nextPos_y);
-//        if (!originalList.Contains(square) && !surroundSquares.Contains(square) && square.StaticType == Enumerators.StaticSquareType.WTR) {
-//            surroundSquares.Add(square);
-//        }
+    public static void LeaveTrack(IntVector2 position) {
+        _typePixels[position.x, position.y] = Enumerators.SquareType.TRACK;
+        _trackList.Add(position);
+    }
 
-//        nextPos_x = position.x;
-//        nextPos_y = position.y + 1;
-//        square = GetBackGroundSquareXY(nextPos_x, nextPos_y);
-//        if (!originalList.Contains(square) && !surroundSquares.Contains(square) && square.StaticType == Enumerators.StaticSquareType.WTR) {
-//            surroundSquares.Add(square);
-//        }
-//        //nextPos_x = position.x - 1;
-//        //nextPos_y = position.y - 1;
-//        //square = GetBackGroundSquareXY(nextPos_x, nextPos_y);
-//        //if (square != null && !originalList.Contains(square) && !checkingList.Contains(square) && !surroundSquares.Contains(square) && square.StaticType == Enumerators.StaticSquareType.WTR) {
-//        //    surroundSquares.Add(square);
-//        //}
+    #endregion
 
-//        //nextPos_x = position.x + 1;
-//        //nextPos_y = position.y + 1;
-//        //square = GetBackGroundSquareXY(nextPos_x, nextPos_y);
-//        //if (square != null && !originalList.Contains(square) && !checkingList.Contains(square) && !surroundSquares.Contains(square) && square.StaticType == Enumerators.StaticSquareType.WTR) {
-//        //    surroundSquares.Add(square);
-//        //}
+    #region getSquare
 
-//        //nextPos_x = position.x - 1;
-//        //nextPos_y = position.y + 1;
-//        //square = GetBackGroundSquareXY(nextPos_x, nextPos_y);
-//        //if (square != null && !originalList.Contains(square) && !checkingList.Contains(square) && !surroundSquares.Contains(square) && square.StaticType == Enumerators.StaticSquareType.WTR) {
-//        //    surroundSquares.Add(square);
-//        //}
+    public static Enumerators.SquareType GetType(IntVector2 position) {
+        return _typePixels[position.x, position.y];
+    }
 
-//        //nextPos_x = position.x + 1;
-//        //nextPos_y = position.y - 1;
-//        //square = GetBackGroundSquareXY(nextPos_x, nextPos_y);
-//        //if (square != null && !originalList.Contains(square) && !checkingList.Contains(square) && !surroundSquares.Contains(square) && square.StaticType == Enumerators.StaticSquareType.WTR) {
-//        //    surroundSquares.Add(square);
-//        //}
-//    }
+    public static Enumerators.SquareType GetType(int x, int y) {
+        return _typePixels[x, y];
+    }
 
-//    private static List<StaticSquare> GetEnemyField(Enemy enemy) {
-//        List<StaticSquare> returnedList = new List<StaticSquare>();
-//        List<StaticSquare> checkingList = new List<StaticSquare>();
-//        List<StaticSquare> surroundSquares = new List<StaticSquare>();
+    public static Image GetImage(int x, int y) {
+        return _sceneImgs[x, y];
+    }
 
-//        checkingList.Add(GetBackGroundSquare(enemy.Position));
-//        returnedList.Add(GetBackGroundSquare(enemy.Position));
-//        int i = 0;
-//        while (true) {
-//            for (int i_c = 0; i_c < checkingList.Count; i_c++) {
-//                GetSurroundSquares(checkingList[i_c].Position, returnedList, checkingList, surroundSquares);
-//            }
-//            if (checkingList.Count < 1) {
-//                break;
-//            }
-//            returnedList.AddRange(checkingList);
-//            checkingList.Clear();
-//            checkingList.AddRange(surroundSquares);
-//            surroundSquares.Clear();
-//            i++;
-//            if (i > 120) break;
-//        }
-//        return returnedList;
-//    }
+    public static Image GetImage(IntVector2 position) {
+        return _sceneImgs[position.x, position.y];
+    }
 
-//    public static void SeizeFieldsWithNoEnemies() {
+    #endregion
 
-//        foreach (StaticSquare track in _tracks) {
-//            track.StaticType = Enumerators.StaticSquareType.GRD;
-//        }
-//        _tracks.Clear();
+    #region playerControlling
+    public static Enumerators.PlayerDirection GetPlayerDirection() {
+        return _player.Direction;
+    }
 
-//        List<StaticSquare> enemyFields = new List<StaticSquare>();
-//        foreach (Enemy enemy in _enemies) {
-//            foreach (StaticSquare square in GetEnemyField(enemy)) {
-//                enemyFields.Add(square);
-//                //GetBackgroundImage(square.Position).color = Color.red;
-//            }
-//        }
+    public static void ResetPlayer() {
+        _player.Position = new IntVector2(_blocksX / 2, 0);
+        _player.IsMoving = false;
+        _player.IsLeavingTrack = false;
+    }
 
-//        for (int x = 0; x < cols; x++) {
-//            for (int y = 0; y < rows; y++) {
-//                if (!enemyFields.Contains(_staticBackground[y, x])) {
-//                    _staticBackground[y, x].StaticType = Enumerators.StaticSquareType.GRD;
-//                }
-//            }
-//        }
-//        //foreach (StaticSquare square in enemyFields) {
-//        //    square.StaticType = Enumerators.StaticSquareType.WTR;
-//        //}
-//        //UpdateField();
-//    }
-//}
+    public static bool IsPlayerMooving
+    {
+        get { return _player.IsMoving; }
+        set { _player.IsMoving = value; }
+    }
+
+    public static bool IsPlayerLeavingTrack {
+        get { return _player.IsLeavingTrack; }
+    }
+
+    public static void SetPlayerDirection(Enumerators.PlayerDirection dir) {
+        _player.Direction = dir;
+    }
+
+    #endregion
+
+    public static void ShowScreenButton() {
+        ResetField();
+        IsPaused = true;
+        _buttonScreen.interactable = true;
+        _buttonScreen.gameObject.SetActive(true);
+        _textMainEvent.gameObject.SetActive(true);
+        _textMainEvent.text = _textStartGame;
+    }
+
+    public static bool IsOutOfRange(IntVector2 position) {
+        return position.x >= _blocksX || position.x < 0 || position.y >= _blocksY || position.y < 0;
+    }
+
+    public static void ResetField() {
+        _notCountedSurroundBlocks = 0;
+        for (int x = 0; x < _blocksX; x++) {
+            for (int y = 0; y < _blocksY; y++) {
+                if (x < 2 || x >= _blocksX - 2 || y < 2 || y >= _blocksY - 2) {
+                    _notCountedSurroundBlocks++;
+                    _sceneImgs[x, y].color = _groundColor;
+                    _typePixels[x, y] = Enumerators.SquareType.GROUND;
+                }
+                else {
+                    _sceneImgs[x, y].color = _waterColor;
+                    _typePixels[x, y] = Enumerators.SquareType.WATER;
+                }
+            }
+        }
+        RestartLevel();
+    }
+
+    private static void DeleteGroundEnemies() {
+        List<Enemy> enemiesToRemove = new List<Enemy>();
+        for (int i = 0; i < _enemies.Count; i++) {
+            if (_enemies[i].Type == Enumerators.EnemyType.EGR) enemiesToRemove.Add(_enemies[i]);
+        } 
+        for (int i = 0; i < enemiesToRemove.Count; i++) {
+            _enemies.Remove(enemiesToRemove[i]);
+        }
+    }
+
+    private static void DeleteWaterEnemies() {
+        List<Enemy> enemiesToRemove = new List<Enemy>();
+        for (int i = 0; i < _enemies.Count; i++) {
+            if (_enemies[i].Type == Enumerators.EnemyType.EWT) enemiesToRemove.Add(_enemies[i]);
+        }
+        for (int i = 0; i < enemiesToRemove.Count; i++) {
+            _enemies.Remove(enemiesToRemove[i]);
+        }
+    }
+
+    private static bool AreWaterEnemiesOnField() {
+        for (int i = 0; i < _enemies.Count; i++) {
+            if (_enemies[i].Type == Enumerators.EnemyType.EWT) return true;
+        }
+        return false;
+    }
+
+    private static int GetWaterEnemiesCount() {
+        int count = 0;
+        for (int i = 0; i < _enemies.Count; i++) {
+            if (_enemies[count].Type == Enumerators.EnemyType.EWT) count++;
+        }
+        return count;
+    }
+
+    private static void RestartLevel() {
+        RemoveTracks();
+        ResetPlayer();
+        DeleteGroundEnemies();
+        int groundHalfRange = (_blocksX / 2) - (_rangeBetweenOnSpawn * _enemiesGroundCount) / 2;
+        for (int i = 0; i < _enemiesGroundCount; i++) {
+            AddGroundEnemy(groundHalfRange + i * _rangeBetweenOnSpawn);
+        }
+        if (!AreWaterEnemiesOnField()) {
+            int waterHalfRange = (_blocksX / 2) - (_rangeBetweenOnSpawn * _enemiesWaterCount) / 2;
+            for (int i = 0; i < _enemiesWaterCount; i++) {
+                AddWaterEnemy(waterHalfRange + i * _rangeBetweenOnSpawn);
+            }
+        }
+        if (GetWaterEnemiesCount() < _enemiesWaterCount) {
+            DeleteWaterEnemies();
+            int waterHalfRange = (_blocksX / 2) - (_rangeBetweenOnSpawn * _enemiesWaterCount) / 2;
+            for (int i = 0; i < _enemiesWaterCount; i++) {
+                AddWaterEnemy(waterHalfRange + i * _rangeBetweenOnSpawn);
+            }
+        }
+    }
+
+    private static void RemoveTracks() {
+        for (int i = 0; i < _trackList.Count; i++) {
+            _typePixels[_trackList[i].x, _trackList[i].y] = Enumerators.SquareType.WATER;
+        }
+        _trackList.RemoveRange(0, _trackList.Count);
+        
+    }
+
+    private static void ResetScore() {
+        Lives = 2;
+        Score = 0;
+        Level = 1;
+        _enemiesGroundCount = _defEnemiesGroundCount;
+        _enemiesWaterCount = _defEenemiesWaterCount;
+        Completed = 0;
+        TimeAlive = 0;
+    }
+
+    private static void GoToNextLevel() {
+        _isPaused = true;
+        _buttonPause.interactable = false;
+        AudioManager.PlaySoundType(Enumerators.SoundType.WIN);
+        TimeManager.AddTimer(StartNextLevel, null, false, Time.time, 0, Time.time + 2);
+    }
+
+    private static void StartNextLevel(object[] args) {
+        _isPaused = false;
+        _buttonPause.interactable = true;
+        Completed = 0;
+        TimeAlive = 0;
+        Lives++;
+        Level++;
+        _enemiesGroundCount = 1 + (int)(Level * _enemiesGroundAddRate);
+        _enemiesWaterCount = 1 + (int)(Level * _enemiesWaterAddRate);
+        ResetField();
+        RestartLevel();
+    }
+
+    public static void QuitGame() {
+        IsPaused = true;
+        ResetPlayer();
+        DeleteEnemies();
+        IsPaused = true;
+        StateManager.AppState = Enumerators.AppState.MENU;
+        UIManager.OpenScoretabWithInput();
+    }
+    
+    public static void DeleteEnemies() {
+        _enemies.RemoveRange(0, _enemies.Count);
+    }
+
+    public static void UpdateVisualField() {
+        for (int x = 0; x < _blocksX; x++) {
+            for (int y = 0; y < _blocksY; y++) {
+                GetImage(x, y).sprite = null;
+                switch (GetType(x, y)) {
+                    case Enumerators.SquareType.GROUND:
+                        GetImage(x, y).color = _groundColor;
+                        break;
+                    case Enumerators.SquareType.WATER:
+                        GetImage(x, y).color = _waterColor;
+                        break;
+                    case Enumerators.SquareType.TRACK:
+                        GetImage(x, y).color = _trackColor;
+                        break;
+                }
+            }
+        }
+        for (int i = 0; i < _enemies.Count; i++) {
+            switch (_enemies[i].Type) {
+                case Enumerators.EnemyType.EGR:
+                    GetImage(_enemies[i].Position).sprite = _enemyGroundImg;
+                    GetImage(_enemies[i].Position).color = Color.white;
+                    break;
+                case Enumerators.EnemyType.EWT:
+                    GetImage(_enemies[i].Position).sprite = _enemyWaterImg;
+                    GetImage(_enemies[i].Position).color = Color.white;
+                    break;
+            }
+        }
+        GetImage(_player.Position).sprite = _playerImg;
+        GetImage(_player.Position).color = Color.white;
+    }
+
+    public static void Update() {
+        while (_nextPlayTime < Time.time) {
+            if (_timeAlive > _maxTimeAlive) {
+                Die();
+                TimeAlive = 0;
+            }
+            _player.Move();
+            for (int i = 0; i < _enemies.Count; i++) {
+                _enemies[i].Move();
+            }
+            UpdateVisualField();
+            TimeAlive += _updateDelay;
+            _nextPlayTime += _updateDelay;
+        }
+    }
+
+    public static void Die() {
+        AudioManager.PlaySoundType(Enumerators.SoundType.LOSE);
+        _isPaused = true;
+        _buttonPause.interactable = false;
+        TimeManager.AddTimer(RestartAfterDeath, null, false, Time.time, 0, Time.time + 1.3f);
+    }
+
+    private static void RestartAfterDeath(object[] args) {
+        _isPaused = false;
+        _buttonPause.interactable = true;
+        RestartLevel();
+        Lives--;
+        if (_lives < 0) {
+            QuitGame();
+        }
+    }
+
+    public static void FillSquare(IntVector2 position) {
+        _typePixels[position.x, position.y] = Enumerators.SquareType.TRACK;
+        IntVector2 U = position.GetU();
+            if (GetType(U) == Enumerators.SquareType.WATER) FillSquare(U);
+        IntVector2 D = position.GetD();
+            if (GetType(D) == Enumerators.SquareType.WATER) FillSquare(D);
+        IntVector2 R = position.GetR();
+            if (GetType(R) == Enumerators.SquareType.WATER) FillSquare(R);
+        IntVector2 L = position.GetL();
+            if (GetType(L) == Enumerators.SquareType.WATER) FillSquare(L);
+    }
+
+    public static void SeizeField() {
+        foreach (Enemy enemy in _enemies) {
+            if (enemy.Type == Enumerators.EnemyType.EWT) FillSquare(enemy.Position);
+        }
+
+        int count_gr = 0;
+        int count_seized = 0;
+        for (int i = 0; i < _trackList.Count; i++, count_gr++, count_seized++) {
+            _typePixels[_trackList[i].x, _trackList[i].y] = Enumerators.SquareType.GROUND;
+        }
+
+        _trackList.RemoveRange(0, _trackList.Count);
+
+        for (int x = 0; x < _blocksX; x++) for (int y = 0; y < _blocksY; y++) {
+                switch (GetType(x, y)) {
+                    case Enumerators.SquareType.WATER:
+                        _typePixels[x, y] = Enumerators.SquareType.GROUND;
+                        count_gr++;
+                        count_seized++;
+                        break;
+                    case Enumerators.SquareType.TRACK:
+                        _typePixels[x, y] = Enumerators.SquareType.WATER;
+                        break;
+                    case Enumerators.SquareType.GROUND:
+                        count_gr++;
+                        break;
+                }
+            }
+        Completed = (100 * (count_gr - _notCountedSurroundBlocks)) / (_blocksX * _blocksY - _notCountedSurroundBlocks);
+        Score += count_seized * _scoreMultiplier;
+        if (Completed >= _borderComplToWin) {
+            _isPaused = true;
+            _buttonPause.interactable = false;
+            GoToNextLevel();
+        }
+    }
+}

@@ -53,6 +53,12 @@ public static class TimeManager {
     }
 
     public static void Update() {
+
+        if (!GameManager.IsPaused) {
+            SwipeInput.SetDirection();
+            GameManager.Update();
+        }
+
         for (int i = 0; i < _timers.Count; i++) {
             if (!_timers[i].UpdateTimer()) {
                 _timers.RemoveAt(i);

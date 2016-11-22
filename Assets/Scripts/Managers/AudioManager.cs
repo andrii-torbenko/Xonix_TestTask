@@ -37,7 +37,7 @@ public static class AudioManager {
                 break;
         }
     }
-
+    
     public static void PlayMusic() {
         _audioSource.Stop();
         _audioSource.loop = true;
@@ -48,7 +48,7 @@ public static class AudioManager {
     public static void Stop() {
         _audioSource.Stop();
     }
-
+    
     public static bool Mute() {
         if (!_audioSource.mute) {
             _audioSource.mute = true;
@@ -58,8 +58,4 @@ public static class AudioManager {
         }
         return _audioSource.mute;
     }
-    //public static void PlaySound(AudioClip clip) {
-    //    _audioSource.loop = true;
-    //    _audioSource.PlayOneShot(clip);
-    //}
 }

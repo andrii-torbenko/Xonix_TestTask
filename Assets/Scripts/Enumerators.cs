@@ -14,6 +14,18 @@ public class Enumerators {
         PAGE_SCORETAB,
     }
 
+    public enum SoundType {
+        WIN,
+        LOSE,
+        SCORETAB
+    }
+
+    public enum SquareType {
+        GROUND,
+        WATER,
+        TRACK
+    }
+
     public enum EnemyDirection {
         LU, // Left Up
         LD, // Left Down
@@ -28,21 +40,8 @@ public class Enumerators {
         U   // Up
     }
 
-
-    public enum StaticSquareType {
-        GRD, // Ground
-        WTR, // Water
-        TRK, // Track
-    }
-
     public enum EnemyType {
         EGR, // On-ground enemy
         EWT, // On-water enemy
-    }
-
-    public enum SoundType {
-        WIN,
-        LOSE,
-        SCORETAB
     }
 }

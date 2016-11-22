@@ -2,9 +2,11 @@
 
 public class Player {
     private IntVector2 _position;
+
     private bool _isMoving = false,
                  _isLeavingTrack = false;
-    private Enumerators.PlayerDirection _dir = Enumerators.PlayerDirection.R;
+
+    private Enumerators.PlayerDirection _dir = Enumerators.PlayerDirection.D;
 
     public Enumerators.PlayerDirection Direction
     {
@@ -12,7 +14,10 @@ public class Player {
         set { _dir = value; }
     }
 
-    public bool IsLeavingTrack { get { return _isLeavingTrack; } }
+    public bool IsLeavingTrack {
+        get { return _isLeavingTrack; }
+        set { _isLeavingTrack = value; }
+    }
 
     public bool IsMoving {
         get { return _isMoving; }
@@ -23,10 +28,6 @@ public class Player {
     {
         get { return _position; }
         set { _position = value; }
-    }
-
-    public void StartMoving() {
-        _isMoving = true;
     }
 
     private IntVector2 GetNextPosition() {
@@ -55,29 +56,20 @@ public class Player {
             return;
         }
         else {
-            //if (!_isLeavingTrack && FieldManager.GetType(nextPos) == FieldManager.SquareType.WATER) {
-            //    _isLeavingTrack = true;
-            //}
-            //if (_isLeavingTrack && FieldManager.GetType(nextPos) == FieldManager.SquareType.GROUND) {
-            //    _isLeavingTrack = false;
-            //    _isMoving = false;
-            //}
             if (_isMoving) _position = nextPos;
 
             if (_isLeavingTrack) {
-                if (GameManager.GetType(nextPos) == GameManager.SquareType.GROUND) {
+                if (GameManager.GetType(nextPos) == Enumerators.SquareType.GROUND) {
                     _isLeavingTrack = false;
                     _isMoving = false;
                     GameManager.SeizeField();
                 }
             }
             else {
-                if (GameManager.GetType(nextPos) == GameManager.SquareType.WATER) {
+                if (GameManager.GetType(nextPos) == Enumerators.SquareType.WATER) {
                     _isLeavingTrack = true;
                 }
             }
-
-
             if (_isLeavingTrack) {
                 GameManager.LeaveTrack(_position);
             }

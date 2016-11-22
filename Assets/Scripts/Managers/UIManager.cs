@@ -13,9 +13,8 @@ public static class UIManager {
 
     private static Canvas _canvas;
 
-    private static GameObject _background;
-
-    private static GameObject _authorText;
+    private static GameObject _background,
+                              _authorText;
 
     public static Canvas Canvas
     {
@@ -47,7 +46,7 @@ public static class UIManager {
                 break;
             case Enumerators.UIState.PAGE_SCORETAB:
                 _pageScoretab.Show();
-                //((PageScoreTab)_pageScoretab).ShowPopup();
+                ((PageScoreTab)_pageScoretab).HidePopup(null);
                 break;
         }
     }
@@ -66,6 +65,7 @@ public static class UIManager {
 
     public static void OpenScoretabWithInput() {
         ShowPage(Enumerators.UIState.PAGE_SCORETAB);
+        AudioManager.PlaySoundType(Enumerators.SoundType.SCORETAB);
         ((PageScoreTab)_pageScoretab).ShowPopup();
     }
 

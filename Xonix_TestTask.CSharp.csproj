@@ -65,28 +65,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\InputFieldClose.cs" />
     <Compile Include="Assets\Scripts\Enumerators.cs" />
     <Compile Include="Assets\Scripts\Extensions\IntVector2.cs" />
     <Compile Include="Assets\Scripts\Extensions\SwipeInput.cs" />
     <Compile Include="Assets\Scripts\MainEntryPoint.cs" />
     <Compile Include="Assets\Scripts\Managers\AudioManager.cs" />
     <Compile Include="Assets\Scripts\Managers\DataManager.cs" />
-    <Compile Include="Assets\Scripts\Managers\FieldManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
-    <Compile Include="Assets\Scripts\Managers\StateManager - Copy.cs" />
+    <Compile Include="Assets\Scripts\Managers\StateManager.cs" />
     <Compile Include="Assets\Scripts\Managers\TimeManager.cs" />
     <Compile Include="Assets\Scripts\Managers\UIManager.cs" />
-    <Compile Include="Assets\Scripts\Objects\DynamicSquare.cs" />
     <Compile Include="Assets\Scripts\Objects\Enemy.cs" />
     <Compile Include="Assets\Scripts\Objects\Player.cs" />
-    <Compile Include="Assets\Scripts\Objects\Square.cs" />
-    <Compile Include="Assets\Scripts\Objects\StaticSquare.cs" />
     <Compile Include="Assets\Scripts\Page.cs" />
     <Compile Include="Assets\Scripts\Pages\PageMainMenu.cs" />
     <Compile Include="Assets\Scripts\Pages\PageOptions.cs" />
     <Compile Include="Assets\Scripts\Pages\PageScoretab.cs" />
-    <Compile Include="Assets\Scripts\PlayerData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

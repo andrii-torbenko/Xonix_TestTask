@@ -9,7 +9,7 @@ public static class SwipeInput {
                     Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
 
                     if (Mathf.Abs(touchDeltaPosition.x) > Mathf.Abs(touchDeltaPosition.y)) {
-                        if (touchDeltaPosition.x > 0) {
+                        if (touchDeltaPosition.x < 0) {
                              BaseSetDir(Enumerators.PlayerDirection.R);
                 }
                         else {
@@ -17,7 +17,7 @@ public static class SwipeInput {
                 }
                     }
                     else {
-                        if (touchDeltaPosition.y > 0) {
+                        if (touchDeltaPosition.y < 0) {
                     BaseSetDir(Enumerators.PlayerDirection.U);
                 }
                         else {
@@ -42,7 +42,7 @@ public static class SwipeInput {
 #endif
     }
 
-    public static void BaseSetDir(Enumerators.PlayerDirection playerDirection) {
+    private static void BaseSetDir(Enumerators.PlayerDirection playerDirection) {
         Enumerators.PlayerDirection reversePlayerDir;
 
         switch (playerDirection) {
@@ -62,16 +62,16 @@ public static class SwipeInput {
                 throw new System.Exception();
         }
 
-        if (GameManager.GetPlayerDirection() == playerDirection && GameManager.IsPlayerMooving()) {
-            if (GameManager.IsPlayerOnWater()) {
+        if (GameManager.GetPlayerDirection() == playerDirection && GameManager.IsPlayerMooving) {
+            if (GameManager.IsPlayerLeavingTrack) {
                 GameManager.Die();
             }
             else {
-                GameManager.StopPlayer();
+                GameManager.SetPlayerDirection(reversePlayerDir);
             }
         }
         else {
-            GameManager.StartPlayer();
+            GameManager.IsPlayerMooving = true;
             GameManager.SetPlayerDirection(reversePlayerDir);
         }
     }
