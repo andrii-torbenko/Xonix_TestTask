@@ -64,6 +64,9 @@ public class Player {
                     _isMoving = false;
                     GameManager.SeizeField();
                 }
+                else if (GameManager.GetType(nextPos) == Enumerators.SquareType.TRACK) {
+                    GameManager.Die();
+                    }
             }
             else {
                 if (GameManager.GetType(nextPos) == Enumerators.SquareType.WATER) {
